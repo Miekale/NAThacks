@@ -153,7 +153,7 @@ dmypy.json
 cython_debug/
 
 # Training data
-spec_data/
+hymenoptera_data/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
