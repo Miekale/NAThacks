@@ -23,6 +23,48 @@ def follow(thefile):
 # regex for the eeg values
 pattern = r'^(-?\d+(\.\d+)?(?:[eE][-+]?\d+)?,\s?){14}-?\d+(\.\d+)?(?:[eE][-+]?\d+)?,\s?(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})$'
 
+frequency = 100
+def makeImage(window):
+    images =  []
+    labels = []
+    
+    signals = np.zeros([4,len(window)])
+
+    window = list(window)
+    for x in range(len(window)):
+        sign = window[x]
+        splStr = window[x].split(", ")
+        values = []
+        for i in splStr[1:5]:
+            values.append(float(i))
+        for i in range(len(values)):
+            if values[i] > 60:
+                values[i] = 0
+        signals[0:3,x] = values[0:3]
+        # signals[1,x] = float(splStr[2])
+        # signals[2,x] = float(splStr[3])
+        # signals[3,x] = float(splStr[4])
+    
+
+    prc_overlap = .9
+    #Getting signal data for 4 second period
+    
+
+
+
+    f, t, image = signal.spectrogram(signals,frequency, nperseg = frequency, noverlap = frequency*prc_overlap)
+    image = np.transpose(image,(1,2,0))
+
+    #updating information containers
+    package = [f,t,image]
+    images.append(package)
+
+    plt.pcolormesh(t, f, image[:,:,0], shading='gouraud')
+    plt.show()
+    plt.ylim(0,40)
+
+
+
 def main(filepath):
     logfile = open(filepath,"r")
     loglines = follow(logfile)
@@ -48,12 +90,17 @@ def main(filepath):
 
             window.append(waitSend)
             windowTime.append(time_integer)
+            
+            prTest = False
             while time_integer - windowTime[0] > 4:
+                prTest = True
                 window.pop(0)
                 windowTime.pop(0)
 
             # The Queue window contains the last 4 seconds of brain activity
-            
+            if prTest:
+                makeImage(window)
+                
             #test print:
             #print(window[0])
 
@@ -69,16 +116,3 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main(args.filepath)
-    
-frequency = 100
-headers = "Sample Index, EXG Channel 0, EXG Channel 1, EXG Channel 2, EXG Channel 3, Accel Channel 0, Accel Channel 1, Accel Channel 2, Other, Other, Other, Other, Other, Timestamp, Other, Timestamp (Formatted)".split(', ')
-def makeImage(window):
-    #Generating spectogram
-    f, t, image = signal.spectrogram(signals,frequency)
-    # plt.plot(signals)
-    image =np.transpose(image,(1,2,0))
-
-    for count in range(4):
-        plt.pcolormesh(t, f, image[:,:,count], shading='gouraud')
-        plt.ylim(0,7)
-        plt.show()
