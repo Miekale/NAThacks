@@ -154,6 +154,8 @@ cython_debug/
 
 # Training data
 hymenoptera_data/
+data/
+spec_data/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
