@@ -10,6 +10,7 @@ from scipy import signal
 import pyedflib
 from pyedflib import highlevel
 from datetime import datetime
+import cv2
 
 def follow(thefile):
     thefile.seek(0,2)
@@ -59,9 +60,24 @@ def makeImage(window):
     package = [f,t,image]
     images.append(package)
 
-    plt.pcolormesh(t, f, image[:,:,0], shading='gouraud')
-    plt.show()
-    plt.ylim(0,40)
+    # Create a matplotlib figure for rendering
+    fig, ax = plt.subplots()
+    im = ax.pcolormesh(t, f, image[:, :, 0], shading='gouraud')
+    ax.set_ylim(0, 40)
+
+    # Convert the figure to an image
+    fig.canvas.draw()
+    img = np.array(fig.canvas.renderer.buffer_rgba())
+
+    # Display the image using OpenCV
+    cv2.imshow('Spectrogram', img)
+    cv2.waitKey(1)  # Add a short delay to allow the image to be displayed
+
+    plt.close(fig)
+
+    # plt.pcolormesh(t, f, image[:,:,0], shading='gouraud')
+    # plt.show()
+    # plt.ylim(0,40)
 
 
 
