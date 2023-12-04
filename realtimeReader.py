@@ -13,6 +13,8 @@ from datetime import datetime
 import cv2
 from PIL import Image as im
 
+from matplotlib.backends.backend_agg import FigureCanvas
+
 def follow(thefile):
     thefile.seek(0,2)
     while True:
@@ -71,9 +73,12 @@ def makeImage(window):
         im = ax.pcolormesh(t, f, image[:, :, i], shading='gouraud')
         ax.set_ylim(0, 40)
         
+        canvas = FigureCanvas(fig)
+        
         # Convert the figure to an image
-        fig.canvas.draw()
-        img = np.array(fig.canvas.renderer.buffer_rgba())
+        canvas.draw()
+        
+        img = np.array(canvas.renderer.buffer_rgba(), dtype='uint8')
         images.append(img)
         plt.close(fig)
     # Display the image using OpenCV
@@ -84,7 +89,7 @@ def makeImage(window):
     cv2.imshow('Spectrogram', model_image)
     cv2.waitKey(1)  # Add a short delay to allow the image to be displayed
 
-    # plt.pcolormesh(t, f, image[:,:,0], shading='gouraud')
+    # plt.pcolormesh(t, f, image[:,:,0])
     # plt.show()
     # plt.ylim(0,40)
 
